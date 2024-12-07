@@ -1,6 +1,11 @@
 import React, { useRef, useState } from "react";
 import Header from "./Header";
 import validateForm from "../utils/validate";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { auth } from "../utils/firebase";
 
 const Login = () => {
   const [isSiginForm, setIsSiginForm] = useState(true);
@@ -14,6 +19,48 @@ const Login = () => {
     e.preventDefault();
     const message = validateForm(email.current.value, password.current.value);
     setErrMessage(message);
+
+    if (message) return;
+
+    if (!isSiginForm) {
+      createUserWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed up
+          const user = userCredential.user;
+          console.log(user);
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          setErrMessage(errorCode + " - " + errorMessage);
+        });
+    } else {
+      signInWithEmailAndPassword(
+        auth,
+        email.current.value,
+        password.current.value
+      )
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user);
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+
+          errorCode === "auth/invalid-credential"
+            ? setErrMessage("Please check the credtetials")
+            : setErrMessage(errorCode + " - " + errorMessage);
+        });
+    }
+    console.log(name);
+    name.current !== undefined ? (name.current.value = "") : "";
+    email.current.value = password.current.value = "";
   };
 
   return (
