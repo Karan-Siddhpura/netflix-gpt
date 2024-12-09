@@ -27,3 +27,4 @@ dist-ssr
 build
 firebase.json
 src/utils/firebase.js
+src/utils/constant.js
